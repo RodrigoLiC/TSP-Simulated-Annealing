@@ -1,9 +1,9 @@
 import random
 import math
-from typing import List, Tuple
+from collections import defaultdict
 
-Point = Tuple[int, int]
-Edge = Tuple[int, int]
+Point = tuple[int, int]
+Edge = tuple[int, int]
 
 def distance(p1: Point, p2: Point) -> float:
     """
@@ -11,43 +11,37 @@ def distance(p1: Point, p2: Point) -> float:
     """
     return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
 
-def total_path_length(points: List[Point], edges: List[Edge]) -> float:
+def total_path_length(points: list[Point], edges: list[Edge]) -> float:
     """
     Calcula la longitud total del ciclo.
     """
     return sum(distance(points[edge[0]], points[edge[1]]) for edge in edges)
 
-def isValid(edges: List[Edge]) -> bool:
+def isValid(edges: list[Edge]) -> bool:
     """
     Verifica si es un ciclo hamiltoniano.
     """
-    n = len(edges)
-    visited = [False] * n
-    current = edges[0][0]  # Empezar desde el primer nodo de la primera arista
-    start_node = current   # Guardar el nodo inicial para verificar el cierre del ciclo
+    graph = defaultdict(list)
+    for u, v in edges:
+        graph[u].append(v)
+        graph[v].append(u)
 
-    # Marcar el nodo inicial como visitado
-    visited[current] = True
-    edge_count = 0
+    visited = set()
+    stack = [edges[0][0]]
 
-    maxiter = 0
-    while edge_count < n and maxiter < n:
-        maxiter += 1
-        for edge in edges:
-            if edge[0] == current and not visited[edge[1]]:
-                current = edge[1]
-                visited[current] = True
-                edge_count += 1
-                break
-            elif edge[1] == current and not visited[edge[0]]:
-                current = edge[0]
-                visited[current] = True
-                edge_count += 1
-                break
-    # Verificar que hemos visitado todos los nodos
-    return all(visited)
+    while stack:
+        node = stack.pop()
+        if node in visited:
+            continue
+        visited.add(node)
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                stack.append(neighbor)
 
-def two_opt_swap(edges: List[Edge]) -> List[Edge]:
+    # Verificamos si todos los nodos fueron visitados
+    return len(visited) == len(edges)
+
+def two_opt_swap(edges: list[Edge]) -> list[Edge]:
     """
     Realiza un intercambio 2-opt, y verifica que el resultado sea un ciclo hamiltoniano.
     """
@@ -61,8 +55,8 @@ def two_opt_swap(edges: List[Edge]) -> List[Edge]:
     edge1 = edges[i]
     edge2 = edges[j]
 
-    new_edges1 = edges.copy()
-    new_edges2 = edges.copy()
+    new_edges1 = edges[:]
+    new_edges2 = edges[:]
     # Intercambiar puntos (A-B C-D) -> (A-D C-B) o (A-C B-D)
     new_edges1[i] = (edge1[0], edge2[1])
     new_edges1[j] = (edge2[0], edge1[1])
@@ -75,10 +69,10 @@ def two_opt_swap(edges: List[Edge]) -> List[Edge]:
         return new_edges2
     
 
-def simulated_annealing_step(points: List[Point], edges: List[Edge], T: float, cooling_factor: float) -> Tuple[List[Edge], float]:
+def simulated_annealing_step(points: list[Point], edges: list[Edge], T: float, cooling_factor: float) -> tuple[list[Edge], float]:
     """
     Realiza un paso del algoritmo de Simulated Annealing utilizando 2-opt.
-
+    \n
     :param points: Lista de puntos (x, y).
     :param edges: Lista de aristas (índices de puntos).
     :param T: Temperatura actual del algoritmo.

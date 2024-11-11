@@ -1,11 +1,10 @@
 import pygame
 import time
-from draw import draw_graph
+from render import draw_graph
 from generation import generate_random_points, generate_hamiltonian_cycle
 from optimization import simulated_annealing_step
 
-# Configuracion de pygame
-pygame.init()
+# Configuracion de Pygame
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("TSP")
@@ -18,7 +17,7 @@ edges = generate_hamiltonian_cycle(points)
 
 # Parametros
 ## Temperatura inicial
-T = 1000
+T = 2000
 ## Factor de enfriamiento
 cf = 0.99
 

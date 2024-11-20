@@ -5,17 +5,11 @@ from collections import defaultdict
 Point = tuple[int, int]
 Edge = tuple[int, int]
 
-def distance(p1: Point, p2: Point) -> float:
-    """
-    Calcula la distancia entre dos puntos.
-    """
-    return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
-
-def total_path_length(points: list[Point], edges: list[Edge]) -> float:
+def total_path_length(points: list[Point], edges: list[Edge], distanceMatrix:  list[list[float]]) -> float:
     """
     Calcula la longitud total del ciclo.
     """
-    return sum(distance(points[edge[0]], points[edge[1]]) for edge in edges)
+    return sum(distanceMatrix[u][v] for u, v in edges)
 
 def isValid(edges: list[Edge]) -> bool:
     """
@@ -69,7 +63,7 @@ def two_opt_swap(edges: list[Edge]) -> list[Edge]:
         return new_edges2
     
 
-def simulated_annealing_step(points: list[Point], edges: list[Edge], T: float, cooling_factor: float) -> tuple[list[Edge], float]:
+def simulated_annealing_step(points: list[Point], edges: list[Edge], T: float, cooling_factor: float, distanceMatrix: list[list[float]]) -> tuple[list[Edge], float]:
     """
     Realiza un paso del algoritmo de Simulated Annealing utilizando 2-opt.
     \n
@@ -79,11 +73,12 @@ def simulated_annealing_step(points: list[Point], edges: list[Edge], T: float, c
     :return: Una tupla con la lista de aristas optimizada y la nueva temperatura.
     """
     current_edges = edges[:]
-    current_length = total_path_length(points, current_edges)
+    current_length = total_path_length(points, current_edges, distanceMatrix)
 
     # Generar un nuevo estado usando 2-opt
     new_edges = two_opt_swap(current_edges)
-    new_length = total_path_length(points, new_edges)
+    
+    new_length = total_path_length(points, new_edges, distanceMatrix)
 
     # Calcular la diferencia de longitud
     delta_length = new_length - current_length

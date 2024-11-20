@@ -1,7 +1,7 @@
 import pygame
 import time
 from render import draw_graph
-from generation import generate_random_points, generate_hamiltonian_cycle
+from generation import generate_random_points, generate_hamiltonian_cycle, generate_distance_matrix
 from optimization import simulated_annealing_step
 
 # Configuracion de Pygame
@@ -11,34 +11,37 @@ pygame.display.set_caption("TSP")
 
 # Generacion de puntos y aristas
 ## Lista de puntos (x, y)
-points = generate_random_points(20, WIDTH, HEIGHT)
+points = generate_random_points(50, WIDTH, HEIGHT)
 ## Lista de aristas (índices de los puntos que conectan)
 edges = generate_hamiltonian_cycle(points)
+## Matriz de distancias entre los puntos
+distance_matrix = generate_distance_matrix(points)
 
 # Parametros
 ## Temperatura inicial
-T = 2000
+T = 500
 ## Factor de enfriamiento
-cf = 0.99
+cf = 0.9998
 
 # Bucle principal
 running = True
+iter = 0
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
     
     # Actualizar aristas
-    edges, T = simulated_annealing_step(points,edges,T,cf)
+    edges, T = simulated_annealing_step(points,edges,T,cf,distance_matrix)
 
     # Dibujar el grafo
-    draw_graph(screen, points, edges, T)
+    if iter % 100 == 0:
+        draw_graph(screen, points, edges, T)
 
     if T < 0.005:
         running = False
 
-    # Esperar
-    time.sleep(0.005)
+    iter+=1
 
 
 draw_graph(screen, points, edges, T, final=True)

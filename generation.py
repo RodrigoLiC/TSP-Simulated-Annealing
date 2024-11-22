@@ -1,5 +1,6 @@
 import random
 import math
+from numpy import linspace
 
 # Tipo para los puntos (coordenadas x, y)
 Point = tuple[int, int]
@@ -56,3 +57,60 @@ def generate_distance_matrix(points: list[Point]) -> list[list[float]]:
         distance_matrix.append(row)
     
     return distance_matrix
+
+def generate_uniform(num_points_x: int, num_points_y: int, width: int, height: int, margin: float = 0.8) -> list[Point]:
+    """
+    Generar una malla de puntos uniformemente distribuidos
+    \n
+    :param num_points_x: Número de puntos en el eje x.
+    :param num_points_y: Número de puntos en el eje y.
+    :param width: Ancho del área.
+    :param height: Altura del área.
+    :param margin: factor del tamaño del cuadrado para no tocar los bordes.
+    :return: Lista de puntos (x, y).
+    """
+    square_size = min(width, height)*margin
+    offset_x = (width - square_size) // 2
+    offset_y = (height - square_size) // 2
+    x_points = linspace(offset_x, offset_x + square_size, num_points_x)
+    y_points = linspace(offset_y, offset_y + square_size, num_points_y)
+    points = [(x, y) for x in x_points for y in y_points]
+    return points
+
+def import_points_and_matrix():
+    """
+    Importa los puntos y la matriz de distancias desde los archivos 'points.txt' y 'matrix.txt'.
+    \n
+    :return: Una tupla con la lista de puntos y la matriz de distancias.
+    """
+    points = []
+    distance_matrix = []
+    with open('points.txt', 'r') as file:
+        for line in file:
+            x, y = map(float, line.strip().split())
+            points.append((x, y))
+    
+    with open('matrix.txt', 'r') as file:
+        for line in file:
+            row = list(map(float, line.strip().split()))
+            distance_matrix.append(row)
+    
+    return points, distance_matrix
+
+
+def export_points_and_matrix(points: list[Point], distance_matrix: list[list[float]]):
+    """
+    Exporta los puntos y la matriz de distancias a los archivos 'points.txt' y 'matrix.txt'.
+    \n
+    :param points: Lista de puntos (x, y).
+    :param distance_matrix: Matriz de distancias entre los puntos.
+    """
+    with open('points.txt', 'w') as file:
+        for point in points:
+            # Escribir cada punto como una línea con formato 'x y'
+            file.write(f"{point[0]} {point[1]}\n")
+    
+    with open('matrix.txt', 'w') as file:
+        for row in distance_matrix:
+            # Escribir cada fila de la matriz, separando los valores por espacio
+            file.write(" ".join(f"{dist:.2f}" for dist in row) + "\n")

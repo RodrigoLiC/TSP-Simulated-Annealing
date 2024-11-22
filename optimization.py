@@ -63,7 +63,7 @@ def two_opt_swap(edges: list[Edge]) -> list[Edge]:
         return new_edges2
     
 
-def simulated_annealing_step(points: list[Point], edges: list[Edge], T: float, cooling_factor: float, distanceMatrix: list[list[float]]) -> tuple[list[Edge], float]:
+def simulated_annealing_step(points: list[Point], edges: list[Edge], temp: float, cooling_factor: float, distanceMatrix: list[list[float]]) -> tuple[list[Edge], float]:
     """
     Realiza un paso del algoritmo de Simulated Annealing utilizando 2-opt.
     \n
@@ -84,12 +84,12 @@ def simulated_annealing_step(points: list[Point], edges: list[Edge], T: float, c
     delta_length = new_length - current_length
 
     # Decidir si aceptamos el nuevo estado
-    if delta_length < 0 or random.random() < math.exp(-delta_length / T):
+    if delta_length < 0 or random.random() < math.exp(-delta_length / temp):
         current_edges = new_edges
         current_length = new_length
         print(f"Mejora encontrada: ΔL = {delta_length:.2f}, Nueva longitud = {current_length:.2f}")
 
     # Reducir la temperatura
-    T *= cooling_factor
+    temp *= cooling_factor
 
-    return current_edges, T
+    return current_edges, temp, current_length
